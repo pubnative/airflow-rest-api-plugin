@@ -846,8 +846,12 @@ class REST_API(BaseView):
     def execute_cli_command(airflow_cmd_split):
         logging.info("Executing CLI Command")
         process = subprocess.Popen(airflow_cmd_split, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        process.wait()
-        return REST_API.collect_process_output(process)
+        (out, err) = process.communicate()
+        return {
+            "stderr": err.decode("utf-8"),
+            "stdin": "",
+            "stdout": out.decode("utf-8")
+        }
 
     # gets and empty object that has all the fields a CLI function would have in it.
     @staticmethod
